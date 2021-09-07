@@ -6,7 +6,7 @@
 
     <groupId>com.github.hwywl</groupId>
     <artifactId>business-tools</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-RELEASE</version>
 
     <name>business-tools</name>
     <description>在开发中积攒下来的业务工具类，方便快速编写业务</description>
