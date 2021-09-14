@@ -17,7 +17,7 @@ import java.util.Map;
  * @description 加载html模板
  * @date create in 2021/9/7 10:36
  */
-public class EmailTemplateUtil {
+public class EmailTemplate {
     /**
      * 邮件的表格头部
      */
@@ -28,11 +28,18 @@ public class EmailTemplateUtil {
      */
     private static final String dataTemplate = "<td>{value}</td>";
 
+    /**
+     * 根据map转换为html
+     *
+     * @param title 标题
+     * @param data  数据
+     * @return 生成的html
+     */
     public static String htmlMapTemplate(String title, List<Map<String, Object>> data) {
         if (CollUtil.isEmpty(data)) {
             return null;
         }
-        InputStream inputStream = EmailTemplateUtil.class.getResourceAsStream("/templates/email.html");
+        InputStream inputStream = EmailTemplate.class.getResourceAsStream("/templates/email.html");
 
         // 拼装头部标题
         StringBuilder titleBuffer = new StringBuilder();
@@ -58,11 +65,19 @@ public class EmailTemplateUtil {
                 .set("listData", dataBuffer.toString()));
     }
 
+    /**
+     * 根据bean转为html
+     *
+     * @param title 标题
+     * @param data  数据
+     * @param <T>   泛型
+     * @return 生成的html
+     */
     public static <T> String htmlBeanTemplate(String title, List<T> data) {
         if (CollUtil.isEmpty(data)) {
             return null;
         }
-        InputStream inputStream = EmailTemplateUtil.class.getResourceAsStream("/templates/email.html");
+        InputStream inputStream = EmailTemplate.class.getResourceAsStream("/templates/email.html");
 
         // 获得字段注解,拼装头部标题
         StringBuilder titleBuffer = new StringBuilder();

@@ -15,13 +15,13 @@ import java.util.Map;
 public class HtmlTest {
     @Test
     public void htmlReadTest() {
-        String template = EmailTemplateUtil.htmlMapTemplate("测试", getModels());
+        String template = EmailTemplate.htmlMapTemplate("测试", getModels());
         System.out.println(template);
     }
 
     @Test
     public void htmlReadBeanTest() {
-        String template = EmailTemplateUtil.htmlBeanTemplate("测试", getBeanModels());
+        String template = EmailTemplate.htmlBeanTemplate("测试", getBeanModels());
         System.out.println(template);
     }
 
