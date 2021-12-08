@@ -20,8 +20,10 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Types;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,14 +34,14 @@ import java.util.Map;
  * @author YI
  * @date 2021-9-3 18:30:11
  */
-public class Parquet {
+public class ParquetUtil {
     /**
      * 将数据写入parquet文件
      *
      * @param parquetPath parquet路径
      * @param bean        对象
      */
-    public static <T> void writerParquet(String parquetPath, T bean) throws IOException, CustomException {
+    public static <T> void writerParquet(String parquetPath, T bean) throws IOException, CustomException, IntrospectionException {
         Group group = getGroup(bean);
         ParquetWriter<Group> writer = getParquetWriter(parquetPath, bean.getClass());
 
@@ -53,7 +55,7 @@ public class Parquet {
      * @param parquetPath parquet路径
      * @param beans       数据集合
      */
-    public static <T> void writerParquet(String parquetPath, List<T> beans) throws IOException, CustomException {
+    public static <T> void writerParquet(String parquetPath, List<T> beans) throws IOException, CustomException, IntrospectionException {
         if (CollUtil.isEmpty(beans)) {
             return;
         }
@@ -146,7 +148,7 @@ public class Parquet {
      * @return ParquetWriter
      * @throws IOException
      */
-    public static <T> ParquetWriter<Group> getParquetWriter(String parquetPath, Class<T> clazz) throws IOException, CustomException {
+    public static <T> ParquetWriter<Group> getParquetWriter(String parquetPath, Class<T> clazz) throws IOException, CustomException, IntrospectionException {
         MessageType messageType = getInstance(clazz);
         Path path = new Path(parquetPath);
         Configuration configuration = new Configuration();
@@ -160,7 +162,7 @@ public class Parquet {
      * @param bean 数据
      * @return
      */
-    public static <T> Group getGroup(T bean) throws CustomException {
+    public static <T> Group getGroup(T bean) throws CustomException, IntrospectionException {
         Class<?> clazz = bean.getClass();
         GroupFactory factory = new SimpleGroupFactory(getInstance(clazz));
         Group group = factory.newGroup();
@@ -195,11 +197,12 @@ public class Parquet {
      * @return MessageType
      * @throws CustomException
      */
-    private static MessageType getInstance(Class<?> clazz) throws CustomException {
+    private static MessageType getInstance(Class<?> clazz) throws CustomException, IntrospectionException {
         Types.MessageTypeBuilder messageTypeBuilder = Types.buildMessage();
-        PropertyDescriptor[] propertyDescriptors = BeanUtil.getPropertyDescriptors(clazz);
+        Field[] fields = clazz.getDeclaredFields();
 
-        for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+        for (Field field : fields) {
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), clazz);
             String fieldName = propertyDescriptor.getName();
             Class<?> propertyType = propertyDescriptor.getPropertyType();
             if (int.class == propertyType || Integer.class == propertyType) {

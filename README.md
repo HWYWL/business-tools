@@ -3,30 +3,19 @@
 
 [![author](https://img.shields.io/badge/author-HWY-red.svg)](https://github.com/HWYWL) [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) 
 
-- [business-tools](#business-tools)
-  * [安装](#--)
-  * [一个增强parquet文件方便读写的工具类](#----parquet----------)
-    + [使用](#--)
-  * [HTML表格生成，可用于邮件发送或者直接展示前端](#html--------------------)
-    + [示例1：](#--1-)
-    + [示例2：](#--2-)
-  * [1.0.1-RELEASE 版本更新](#101-release-----)
-    + [感谢](#--)
-    + [问题建议](#----)
-
 ## 安装
 **maven**
 ```
 <dependency>
     <groupId>com.github.hwywl</groupId>
     <artifactId>business-tools</artifactId>
-    <version>1.0.1-RELEASE</version>
+    <version>1.0.2-RELEASE</version>
 </dependency>
 ```
 
 **Gradle**
 ```
-implementation 'com.github.hwywl:business-tools:1.0.1-RELEASE'
+implementation 'com.github.hwywl:business-tools:1.0.2-RELEASE'
 ```
 
 ## 一个增强parquet文件方便读写的工具类
@@ -42,89 +31,106 @@ implementation 'com.github.hwywl:business-tools:1.0.1-RELEASE'
 
 可以查看github中的源码，不看也行，很简单的，使用如下：
 ```java
-public class ParquetTest {
-    String filePath = "F:\\a.parquet";
+public class ParquetUtilTest {
+  String filePath = "F:\\a.parquet";
 
-    /**
-     * 写入一个数据到parquet文件
-     *
-     * @throws IOException
-     * @throws CustomException
-     */
-    @Test
-    public void ParquetWriteTest() throws IOException, CustomException {
-        TestModel model = getModel();
-        ParquetUtil.writerParquet(filePath, model);
+  /**
+   * 写入一个数据到parquet文件
+   *
+   * @throws IOException
+   * @throws CustomException
+   */
+  @Test
+  public void ParquetWriteTest() throws IOException, CustomException, IntrospectionException {
+    TestModel model = getModel();
+    ParquetUtil.writerParquet(filePath, model);
+  }
+
+  /**
+   * 写入多个数据到parquet文件
+   *
+   * @throws IOException
+   * @throws CustomException
+   */
+  @Test
+  public void ParquetWriteListTest() throws IOException, CustomException, IntrospectionException {
+    List<TestModel> models = getModels();
+    ParquetUtil.writerParquet(filePath, models);
+  }
+
+  /**
+   * 开放原始API，可以用于非一次性写入
+   *
+   * @throws IOException
+   * @throws CustomException
+   * @throws IntrospectionException
+   */
+  @Test
+  public void ParquetWriteGroupListTest() throws IOException, CustomException, IntrospectionException {
+    ParquetWriter<Group> writer = ParquetUtil.getParquetWriter(filePath, TestModel.class);
+    Group group = ParquetUtil.getGroup(getModel());
+    writer.write(group);
+
+    // close写出文件
+    writer.close();
+  }
+
+  /**
+   * 将parquet文件转为对象集合
+   *
+   * @throws IOException
+   */
+  @Test
+  public void ParquetReadBeanTest() throws IOException {
+    List<TestModel> models = ParquetUtil.readParquetBean(filePath, TestModel.class);
+    System.out.println(models);
+  }
+
+  /**
+   * 将parquet文件转为Map集合
+   *
+   * @throws IOException
+   */
+  @Test
+  public void ParquetReadMapTest() throws IOException {
+    List<Map<String, Object>> maps = ParquetUtil.readParquetMap(filePath);
+    System.out.println(maps);
+  }
+
+  /**
+   * 将parquet文件转为对象集合,并只拿2条数据
+   *
+   * @throws IOException
+   */
+  @Test
+  public void ParquetReadBeanMaxLineTest() throws IOException {
+    List<TestModel> models = ParquetUtil.readParquetBean(filePath, 2, TestModel.class);
+    System.out.println(models);
+  }
+
+  /**
+   * 测试数据
+   *
+   * @return
+   */
+  private TestModel getModel() {
+    return new TestModel(2, 3, 6L, "校花", 10);
+  }
+
+  /**
+   * 测试数据
+   *
+   * @return
+   */
+  private List<TestModel> getModels() {
+    List<TestModel> arrayList = new ArrayList<>();
+
+    for (int i = 0; i < 10; i++) {
+      arrayList.add(new TestModel(2, 3, 6L, "校花", 10));
     }
 
-    /**
-     * 写入多个数据到parquet文件
-     *
-     * @throws IOException
-     * @throws CustomException
-     */
-    @Test
-    public void ParquetWriteListTest() throws IOException, CustomException {
-        List<TestModel> models = getModels();
-        ParquetUtil.writerParquet(filePath, models);
-    }
-
-    /**
-     * 将parquet文件转为对象集合
-     *
-     * @throws IOException
-     */
-    @Test
-    public void ParquetReadBeanTest() throws IOException {
-        List<TestModel> models = ParquetUtil.readParquetBean(filePath, TestModel.class);
-        System.out.println(models);
-    }
-
-    /**
-     * 将parquet文件转为Map集合
-     *
-     * @throws IOException
-     */
-    @Test
-    public void ParquetReadMapTest() throws IOException {
-        List<Map<String, Object>> maps = ParquetUtil.readParquetMap(filePath);
-        System.out.println(maps);
-    }
-
-    /**
-     * 将parquet文件转为对象集合,并只拿2条数据
-     *
-     * @throws IOException
-     */
-    @Test
-    public void ParquetReadBeanMaxLineTest() throws IOException {
-        List<TestModel> models = ParquetUtil.readParquetBean(filePath, 2, TestModel.class);
-        System.out.println(models);
-    }
-
-    /**
-     * 测试数据
-     *
-     * @return
-     */
-    private TestModel getModel() {
-        return new TestModel(2, 3, 6L, "校花", 10);
-    }
-
-    /**
-     * 测试数据
-     *
-     * @return
-     */
-    private List<TestModel> getModels() {
-        List<TestModel> arrayList = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            arrayList.add(new TestModel(2, 3, 6L, "校花", 10));
-        }
-
-        return arrayList;
-    }
+    return arrayList;
+  }
 }
 ```
 
@@ -206,6 +212,10 @@ public class HtmlModel {
 }
 ```
 ![](https://hwy-figure-bed.oss-cn-hangzhou.aliyuncs.com/blog/image/1630996121533-ceshi.png)
+
+## 1.0.2-RELEASE 版本更新
+1. 开放parquet文件写入的原始API
+2. 修复写入parquet文件乱序问题
 
 ## 1.0.1-RELEASE 版本更新
 1. 增加parquet文件的读写

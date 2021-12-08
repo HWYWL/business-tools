@@ -1,8 +1,11 @@
 package com.github.hwywl.parquet;
 
 import com.github.hwywl.exception.CustomException;
+import org.apache.parquet.example.data.Group;
+import org.apache.parquet.hadoop.ParquetWriter;
 import org.junit.Test;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +17,7 @@ import java.util.Map;
  * @Test
  * @date create in 2021/9/2 18:38
  */
-public class ParquetTest {
+public class ParquetUtilTest {
     String filePath = "F:\\a.parquet";
 
     /**
@@ -24,9 +27,9 @@ public class ParquetTest {
      * @throws CustomException
      */
     @Test
-    public void ParquetWriteTest() throws IOException, CustomException {
+    public void ParquetWriteTest() throws IOException, CustomException, IntrospectionException {
         TestModel model = getModel();
-        Parquet.writerParquet(filePath, model);
+        ParquetUtil.writerParquet(filePath, model);
     }
 
     /**
@@ -36,9 +39,26 @@ public class ParquetTest {
      * @throws CustomException
      */
     @Test
-    public void ParquetWriteListTest() throws IOException, CustomException {
+    public void ParquetWriteListTest() throws IOException, CustomException, IntrospectionException {
         List<TestModel> models = getModels();
-        Parquet.writerParquet(filePath, models);
+        ParquetUtil.writerParquet(filePath, models);
+    }
+
+    /**
+     * 开放原始API，可以用于非一次性写入
+     *
+     * @throws IOException
+     * @throws CustomException
+     * @throws IntrospectionException
+     */
+    @Test
+    public void ParquetWriteGroupListTest() throws IOException, CustomException, IntrospectionException {
+        ParquetWriter<Group> writer = ParquetUtil.getParquetWriter(filePath, TestModel.class);
+        Group group = ParquetUtil.getGroup(getModel());
+        writer.write(group);
+
+        // close写出文件
+        writer.close();
     }
 
     /**
@@ -48,7 +68,7 @@ public class ParquetTest {
      */
     @Test
     public void ParquetReadBeanTest() throws IOException {
-        List<TestModel> models = Parquet.readParquetBean(filePath, TestModel.class);
+        List<TestModel> models = ParquetUtil.readParquetBean(filePath, TestModel.class);
         System.out.println(models);
     }
 
@@ -59,7 +79,7 @@ public class ParquetTest {
      */
     @Test
     public void ParquetReadMapTest() throws IOException {
-        List<Map<String, Object>> maps = Parquet.readParquetMap(filePath);
+        List<Map<String, Object>> maps = ParquetUtil.readParquetMap(filePath);
         System.out.println(maps);
     }
 
@@ -70,7 +90,7 @@ public class ParquetTest {
      */
     @Test
     public void ParquetReadBeanMaxLineTest() throws IOException {
-        List<TestModel> models = Parquet.readParquetBean(filePath, 2, TestModel.class);
+        List<TestModel> models = ParquetUtil.readParquetBean(filePath, 2, TestModel.class);
         System.out.println(models);
     }
 
