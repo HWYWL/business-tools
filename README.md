@@ -9,13 +9,13 @@
 <dependency>
     <groupId>com.github.hwywl</groupId>
     <artifactId>business-tools</artifactId>
-    <version>1.0.2-RELEASE</version>
+    <version>1.0.3-RELEASE</version>
 </dependency>
 ```
 
 **Gradle**
 ```
-implementation 'com.github.hwywl:business-tools:1.0.2-RELEASE'
+implementation 'com.github.hwywl:business-tools:1.0.3-RELEASE'
 ```
 
 ## 一个增强parquet文件方便读写的工具类
@@ -212,6 +212,58 @@ public class HtmlModel {
 }
 ```
 ![](https://hwy-figure-bed.oss-cn-hangzhou.aliyuncs.com/blog/image/1630996121533-ceshi.png)
+
+
+## 一个简单封装的多线程并行工具类
+在我们业务中很多场景为了速度是需要多线程并行运算的，最后再把各个结果集合起来返回。
+示例：
+```java
+public class ParallelThreadTest {
+    /**
+     * 测试并发执行运算
+     */
+    @Test
+    public void parallelTest() throws InterruptedException {
+        List<HtmlModel> list = new ArrayList<>();
+
+        // 模拟四个线程并发执行，最后得到一个结果集
+        Runnable runnable1 = () -> list.addAll(getBeanModels());
+        Runnable runnable2 = () -> list.addAll(getBeanModels());
+        Runnable runnable3 = () -> list.addAll(getBeanModels());
+        Runnable runnable4 = () -> list.addAll(getBeanModels());
+
+        List<Runnable> tasks = Arrays.asList(runnable1, runnable2, runnable3, runnable4);
+
+        int secs = ParallelThread.parallelThreadTask(tasks);
+
+        // 这句代码在正式环境中没有意义，这里是为了防止主线程结束
+        // Junit不支持多线程
+        Thread.sleep(3000);
+
+        System.out.println("线程耗时：" + secs + "毫秒");
+        System.out.println(list);
+    }
+
+    /**
+     * 测试数据
+     *
+     * @return
+     */
+    private List<HtmlModel> getBeanModels() {
+        List<HtmlModel> arrayList = new ArrayList<>();
+
+        for (int i = 0; i < 2; i++) {
+            arrayList.add(new HtmlModel(2, 3, 6L, "校花", 10));
+        }
+
+        return arrayList;
+    }
+}
+```
+
+## 1.0.3-RELEASE 版本更新
+1. 增加一个简单的多线程并发执行工具
+2. 升级开源工具类
 
 ## 1.0.2-RELEASE 版本更新
 1. 开放parquet文件写入的原始API

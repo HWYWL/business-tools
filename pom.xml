@@ -6,7 +6,7 @@
 
     <groupId>com.github.hwywl</groupId>
     <artifactId>business-tools</artifactId>
-    <version>1.0.2-RELEASE</version>
+    <version>1.0.3-RELEASE</version>
 
     <name>business-tools</name>
     <description>在开发中积攒下来的业务工具类，方便快速编写业务</description>
@@ -23,7 +23,7 @@
         <connection>scm:git:https://github.com/HWYWL/business-tools.git</connection>
         <developerConnection>scm:git:https://github.com/HWYWL/business-tools.git</developerConnection>
         <url>https://github.com/HWYWL/business-tools</url>
-        <tag>business-tools-1.0.2</tag>
+        <tag>business-tools-1.0.3</tag>
     </scm>
 
     <developers>
@@ -41,7 +41,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <parquet.version>1.12.1</parquet.version>
         <hadoop-client.version>3.3.1</hadoop-client.version>
-        <hutool-all.version>5.7.16</hutool-all.version>
+        <hutool-all.version>5.7.17</hutool-all.version>
     </properties>
 
     <dependencies>
